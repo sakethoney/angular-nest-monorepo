@@ -1,0 +1,25 @@
+<div style="text-align: center; margin-top: 50px; font-family: Arial, sans-serif;">
+  <h1>Angular Frontend (Nx Monorepo)</h1>
+  
+  <div style="margin-top: 30px;">
+    <div *ngIf="isLoading" style="margin-bottom: 20px;">
+      <h2>Loading in...</h2>
+      <div style="font-size: 72px; color: #3f51b5; font-weight: bold; margin: 20px 0;">
+        {{ counter }}
+      </div>
+      <p style="color: #666;">Calling backend API...</p>
+    </div>
+
+    <div *ngIf="!isLoading">
+      <h2>Message from Nest.js Backend:</h2>
+      <p style="font-size: 24px; color: #e91e63; font-weight: bold;">
+        {{ message }}
+      </p>
+      <p style="color: #4caf50; margin-top: 10px;">
+        ✓ API call completed successfully!
+      </p>
+    </div>
+  </div>
+</div>
+
+<router-outlet></router-outlet>
