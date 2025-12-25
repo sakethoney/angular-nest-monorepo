@@ -1,3 +1,8 @@
+// Test constants
+const COUNTDOWN_DURATION_MS = 5000; // 5 seconds countdown
+const COUNTDOWN_BUFFER_MS = 500; // Small buffer for timing variations
+const COUNTDOWN_TOTAL_WAIT_MS = COUNTDOWN_DURATION_MS + COUNTDOWN_BUFFER_MS;
+
 describe('frontend-e2e', () => {
   beforeEach(() => cy.visit('/'));
 
@@ -14,32 +19,24 @@ describe('frontend-e2e', () => {
     // Check counter starts at 5
     cy.contains('5').should('be.visible');
     
-    // Wait and check it decrements to 4
-    cy.wait(1000);
-    cy.contains('4').should('be.visible');
-    
-    // Wait and check it decrements to 3
-    cy.wait(1000);
-    cy.contains('3').should('be.visible');
-    
-    // Wait and check it decrements to 2
-    cy.wait(1000);
-    cy.contains('2').should('be.visible');
-    
-    // Wait and check it decrements to 1
-    cy.wait(1000);
-    cy.contains('1').should('be.visible');
+    // Use Cypress retry logic to wait for countdown changes
+    cy.contains('4', { timeout: 2000 }).should('be.visible');
+    cy.contains('3', { timeout: 2000 }).should('be.visible');
+    cy.contains('2', { timeout: 2000 }).should('be.visible');
+    cy.contains('1', { timeout: 2000 }).should('be.visible');
   });
 
   it('should call backend API after countdown and display response', () => {
+    const apiUrl = Cypress.env('apiUrl') || 'http://localhost:3000/api';
+    
     // Intercept the API call
-    cy.intercept('GET', 'http://localhost:3000/api', {
+    cy.intercept('GET', apiUrl, {
       statusCode: 200,
       body: 'Hello World!'
     }).as('apiCall');
 
-    // Wait for countdown to complete (5 seconds + small buffer)
-    cy.wait(5500);
+    // Wait for countdown to complete
+    cy.wait(COUNTDOWN_TOTAL_WAIT_MS);
 
     // Verify API was called
     cy.wait('@apiCall');
@@ -54,14 +51,16 @@ describe('frontend-e2e', () => {
   });
 
   it('should handle API errors gracefully', () => {
+    const apiUrl = Cypress.env('apiUrl') || 'http://localhost:3000/api';
+    
     // Intercept the API call with an error
-    cy.intercept('GET', 'http://localhost:3000/api', {
+    cy.intercept('GET', apiUrl, {
       statusCode: 500,
       body: 'Internal Server Error'
     }).as('apiError');
 
     // Wait for countdown to complete
-    cy.wait(5500);
+    cy.wait(COUNTDOWN_TOTAL_WAIT_MS);
 
     // Verify API was called
     cy.wait('@apiError');
@@ -71,11 +70,13 @@ describe('frontend-e2e', () => {
   });
 
   it('should complete full user flow with real API', () => {
+    const apiUrl = Cypress.env('apiUrl') || 'http://localhost:3000/api';
+    
     // Prerequisite: Nest.js backend must be running at http://localhost:3000
     // Perform a simple health check to fail fast if the backend is not available
     cy.request({
       method: 'GET',
-      url: 'http://localhost:3000/api',
+      url: apiUrl,
     });
     // Don't mock the API - test real integration
     // Verify initial state
