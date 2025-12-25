@@ -33,12 +33,4 @@ describe('GET /api', () => {
     expect(res.status).toBe(200);
     expect(res.data).toBe('Hello World!');
   });
-
-  it('should return string response', async () => {
-    const res = await axios.get(`/api`);
-
-    expect(typeof res.data).toBe('string');
-    expect(res.data).toContain('Hello');
-    expect(res.data).toContain('World');
-  });
 });
