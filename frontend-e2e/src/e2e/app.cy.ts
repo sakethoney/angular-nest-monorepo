@@ -71,6 +71,12 @@ describe('frontend-e2e', () => {
   });
 
   it('should complete full user flow with real API', () => {
+    // Prerequisite: Nest.js backend must be running at http://localhost:3000
+    // Perform a simple health check to fail fast if the backend is not available
+    cy.request({
+      method: 'GET',
+      url: 'http://localhost:3000/api',
+    });
     // Don't mock the API - test real integration
     // Verify initial state
     cy.contains('Angular Frontend (Nx Monorepo)').should('be.visible');
