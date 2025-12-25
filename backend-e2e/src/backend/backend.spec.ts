@@ -16,11 +16,15 @@ describe('GET /api', () => {
   });
 
   it('should respond within acceptable time', async () => {
+    // Performance threshold: 1000ms is chosen as a reasonable limit for API health checks
+    // in development/test environments. Adjust via PERFORMANCE_THRESHOLD_MS env var if needed.
+    const performanceThreshold = parseInt(process.env.PERFORMANCE_THRESHOLD_MS || '1000', 10);
+    
     const start = Date.now();
     await axios.get(`/api`);
     const duration = Date.now() - start;
 
-    expect(duration).toBeLessThan(1000); // Should respond within 1 second
+    expect(duration).toBeLessThan(performanceThreshold);
   });
 
   it('should handle CORS correctly', async () => {
@@ -32,5 +36,9 @@ describe('GET /api', () => {
 
     expect(res.status).toBe(200);
     expect(res.data).toBe('Hello World!');
+    
+    // Verify CORS headers are present
+    expect(res.headers['access-control-allow-origin']).toBeDefined();
+    expect(res.headers['access-control-allow-origin']).toBe('http://localhost:4200');
   });
 });
